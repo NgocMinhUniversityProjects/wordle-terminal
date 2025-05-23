@@ -60,6 +60,14 @@ void Printer::next_line() {
     this->move_cursor(this->y + 1, 0);
 };
 
+void Printer::begin_line(){
+    this->move_cursor(this->y, 0);
+}
+
+void Printer::prev_line(){
+    this->move_cursor(this->y - 1, 0);
+}
+
 void Printer::print(string str) {
     for (int i = 0; i <= str.length(); i++) {
         if(i != 0) this->x++;
@@ -80,6 +88,10 @@ void Printer::print(char * str, int len) {
 
 void Printer::println(string str) {
     this->print(str);
+    while(this->x < this->w){
+        this->buffer[this->y][this->x] = ' ';
+        this->x++;
+    }
     this->next_line();
 };
 
@@ -115,7 +127,7 @@ void Printer::getInput(int len, bool readSpace, bool doFlush){
     if(!stopped && doFlush){
         char r = (char) getchar();
         while(r != '\n'){
-            char r = (char) getchar();
+            r = (char) getchar();
         }
     }
 
@@ -137,14 +149,15 @@ void Printer::render(bool insertEndl) {
 
             unsigned int cumulativeSame = 0;
             while(true){
-                if(this->old_buffer[i][k] != this->buffer[i][k]){
-                    if(cumulativeSame != 0) printf("\x1b[%dC", cumulativeSame);
+                if(this->old_buffer.unset){
+                    putchar(this->buffer[i][k]);
+                } else if(this->old_buffer[i][k] != this->buffer[i][k]){
+                    //if(cumulativeSame != 0) printf("\x1b[%dC", cumulativeSame);
                     putchar(this->buffer[i][k]);
                     this->old_buffer[i][k] = this->buffer[i][k];
                     cumulativeSame = 0;
-                } else if(this->old_buffer.unset){
-                    putchar(' ');
                 } else {
+                    putchar(this->buffer[i][k]);
                     cumulativeSame++;
                 }
                 k++;

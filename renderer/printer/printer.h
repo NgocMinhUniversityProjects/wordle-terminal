@@ -60,11 +60,13 @@ class Printer {
 
     void move_cursor(int);
     void move_cursor(int, int);
+    void next_line();
+    void begin_line();
+    void prev_line();
 
     void print(char *, int);
     void print(string);
     void println(string);
-    void next_line();
 
     void clear_line(int);
     void clear();
