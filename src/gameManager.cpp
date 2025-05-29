@@ -38,14 +38,14 @@ Scene gameManager::getScene(enum sceneID id){
     }
     case credit: {
         Scene res = Scene("", false, 0);
-        res.addLine("Made in May 2025 by Ngoc Minh as a university project (allias BlueG15)");
+        res.addLine("Made in May 2025 by Blu");
         res.addLine("");
         res.addLine("Press enter to quit back to main menu.");
         res.setTemp("> ");
         return res;
     }
     case play: {
-        Scene res = Scene("6 <- Numer of guesses left", false, 5);
+        Scene res = Scene("6 <- Numer of guesses left", false, 100);
         res.addLine("");
         res.setTemp("Enter your guess (only 5 letters will be taken):\n> ");
         return res;
@@ -78,6 +78,9 @@ void gameManager::step(){
                     this->currSceneID = play;
                     this->lives = 6;
                     this->hiddenWord = this->randomDict->getRandomWord();
+                    while(!utils::isValidWord( this->hiddenWord.toStr() )){
+                        this->hiddenWord = this->randomDict->getRandomWord();
+                    }
                     return;
                 }
 
@@ -113,7 +116,7 @@ void gameManager::step(){
 
             std::string s = string(printer.inputBuffer, 5);
             Word cWord = Word(s);
-            if(utils::isValidWord(s)){
+            if(utils::isValidWord(s) && printer.lastInputLen == 5){
                 if(this->randomDict->isWordInDictionary(cWord) || this->guessableDict->isWordInDictionary(cWord)){
 
                     std::string com = this->compare(cWord);
@@ -125,10 +128,10 @@ void gameManager::step(){
                         this->currScene.addLine(string("Checked:    |") + com + "|");
                         this->currScene.addLine("");
 
-                        if(this->lives == 100){
+                        if(this->currSceneID == finish){
                             this->currScene.setTemp("You Won!!!!! the word was: \x1b[38:5:10m " + this->hiddenWord.toStr() + " \x1b[0m\n\nPress Enter to return to main menu\n> ");
                             this->currScene.setWaitLen(0);
-                            this->currSceneID = finish;
+                            //this->currSceneID = finish;
                         } else {
                             this->currScene.setTemp("Enter your guess (only 5 letters will be taken):\n> ");
                         }
@@ -138,10 +141,10 @@ void gameManager::step(){
                         this->currScene.addLine(string("Checked:    |") + com + "|");
                         this->currScene.addLine("");
 
-                        if(this->lives == 100){
+                        if(this->currSceneID == finish){
                             this->currScene.setTemp("You Won!!!!! (just barely >.<) the word was: \x1b[38:5:10m " + this->hiddenWord.toStr() + " \x1b[0m\n\nPress Enter to return to main menu\n> ");
                             this->currScene.setWaitLen(0);
-                            this->currSceneID = finish;
+                            // this->currSceneID = finish;
                         } else {
                             this->currScene.setTemp("You lost, the word was: \x1b[38:5:10m " + this->hiddenWord.toStr() + " \x1b[0m\n\nPress Enter to return to main menu\n> ");
                             this->currScene.setWaitLen(0);
@@ -191,7 +194,7 @@ std::string gameManager::compare(Word w){
         }
     }
     if(x == 5) {
-        this->lives = 100;
+        this->currSceneID = finish;
         return std::string() + "\x1b[38:5:10m" + res + "\x1b[0m";
     }
 
@@ -230,3 +233,24 @@ std::string gameManager::compare(Word w){
     res2 += "\x1b[0m";
     return res2;
 }
+
+void gameManager::__debug(int count){
+    printf("Debugging %d words\n", count);
+
+    int x = count;
+    int ValidCount = 0;
+    int InvalidCount = 0;
+    while(x--){
+        Word r = this->randomDict->getRandomWord();
+        bool valid = utils::isValidWord(r.toStr());
+        if(!valid) {
+            InvalidCount++;
+            for(int i = 0; i < 5; i++){
+                printf("%c", r.getCharAtPos(i));
+            }
+            printf("\n");
+        } else ValidCount++;
+    }
+
+    printf("Completed debug test, %d out of %d correct, invalid: %d\n", ValidCount, count, InvalidCount);
+};

@@ -29,5 +29,5 @@ class gameManager {
         void step();
         void loop();
         std::string compare(Word);
-
+        void __debug(int count);
 };

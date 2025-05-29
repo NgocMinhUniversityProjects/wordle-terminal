@@ -5,6 +5,7 @@ int main() {
     g->loop();
     system("cls");
 
+
     // Tree t = Tree();
     // t.insert("aaaab");
     // t.insert("bbbba");

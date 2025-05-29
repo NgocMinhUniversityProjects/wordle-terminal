@@ -15,20 +15,22 @@ Tree::~Tree(){
     }
 }
 
-void Tree::insert(std::string x){
-    if(x.length() != 5) return;
+int Tree::insert(std::string x){
+    if(x.length() != 5) return -1;
 
     Node * curr = this->root;
 
     for(int i = 0; i < 5; i++){
         int offset = x[i] - 'a';
-        if(offset < 0 || offset >= 26) return;
+        if(offset < 0 || offset >= 26) return -1;
         if(curr->nextArr[offset] == nullptr) {
             curr->numValid++;
             curr->nextArr[offset] = new Node();
         }
         curr = curr->nextArr[offset];
     }
+
+    return 0;
 }
 
 bool Tree::inTree(std::string x){
@@ -54,7 +56,7 @@ std::string Tree::getRandom(){
         int randomDir;
         if(curr->numValid <= 1){
             randomDir = 0;
-        } else randomDir = utils::rng(curr->numValid, 0);
+        } else randomDir = utils::rng(curr->numValid - 1, 0);
 
         for(int j = 0; j < 26; j++){
             if(curr->nextArr[j] != nullptr){
